@@ -1,0 +1,11 @@
+  applications:
+  - name: djangoapp
+    routes:
+      - route: arska.net
+    memory: 128M
+    buildpack: python_buildpack
+  - name: djangoapp-nginx
+    routes:
+      - route: arska.net/static
+    memory: 128M
+    buildpack: staticfile_buildpack
