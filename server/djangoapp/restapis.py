@@ -52,7 +52,7 @@ def get_dealers_from_cf(url, **kwargs):
     results = []
     json_result = get_request(url)
     # Retrieve the dealer data from the response
-    dealers = json_result["rows"]
+    dealers = json_result
     # For each dealer in the response
     for dealer in dealers:
         # Get its data in `doc` object
