@@ -66,7 +66,7 @@ def get_dealers_from_cf(url, **kwargs):
 # Requires the dealer_id parameter with only a single value
 def get_dealer_by_id(url, id):
     # Call get_request with the dealer_id param
-    json_result = get_request(url, dealerId=id)
+    json_result = get_request(url, id=id)
     # Create a CarDealer object from response
     dealer = json_result[0]
     dealer_obj = CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
@@ -95,14 +95,13 @@ def get_dealers_by_state(url, state):
 
 # Gets all dealer reviews for a specified dealer from the Cloudant DB
 # Uses the Cloud Function get_reviews
-def get_dealer_reviews_from_cf(url, dealer_id):
+def get_dealer_reviews_from_cf(url, id):
     results = []
     # Perform a GET request with the specified dealer id
-    json_result = get_request(url, dealerId=dealer_id)
-
+    json_result = get_request(url, id=id)
     if json_result:
         # Get all review data from the response
-        reviews = json_result["body"]["data"]["docs"]
+        reviews = json_result["data"]["docs"]
         # For every review in the response
         for review in reviews:
             # Create a DealerReview object from the data
@@ -146,11 +145,12 @@ def analyze_review_sentiments(review_text):
     # Watson NLU configuration
     try:
         if os.environ['env_type'] == 'PRODUCTION':
-            url = os.environ['WATSON_NLU_URL']
-            api_key = os.environ["WATSON_NLU_API_KEY"]
+            url = os.environ['https://api.eu-de.natural-language-understanding.watson.cloud.ibm.com/instances/939d8d82-423a-4de5-871f-7d9a18cda242']
+            api_key = os.environ["adTBmJeekbULg_gImKZEax5WWZCBM6JGZlAsppl-c7ae"]
     except KeyError:
-        url = config('WATSON_NLU_URL')
-        api_key = config('WATSON_NLU_API_KEY')
+        
+        url = 'https://api.eu-de.natural-language-understanding.watson.cloud.ibm.com/instances/939d8d82-423a-4de5-871f-7d9a18cda242'
+        api_key = 'adTBmJeekbULg_gImKZEax5WWZCBM6JGZlAsppl-c7ae'
     version = '2021-08-01'
     authenticator = IAMAuthenticator(api_key)
     nlu = NaturalLanguageUnderstandingV1(
