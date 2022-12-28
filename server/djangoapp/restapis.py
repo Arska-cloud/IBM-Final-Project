@@ -46,25 +46,34 @@ def post_request(url, json_payload, **kwargs):
 # Gets all dealers from the Cloudant DB with the Cloud Function get-dealerships
 def get_dealers_from_cf(url, **kwargs):
     results = []
-    json_result = get_request(url)
-    # Retrieve the dealer data from the response
-    dealers = json_result
-    # For each dealer in the response
-    for dealer in dealers:
-        # Get its data in `doc` object
-        dealer_doc = dealer["doc"]
-        # Create a CarDealer object with values in `doc` object
-        dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"], full_name=dealer_doc["full_name"],
-                               id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"],
-                               short_name=dealer_doc["short_name"],
-                               st=dealer_doc["st"], state=dealer_doc["state"], zip=dealer_doc["zip"])
-        results.append(dealer_obj)
+    state = kwargs.get("state")
+    if state:
+        json_result = get_request(url, state=state)
+    else:
+        json_result = get_request(url)
+
+    print('json_result 55', json_result)    
+
+    if json_result:
+        # Get the row list in JSON as dealers
+        dealers = json_result
+        # For each dealer object
+        for dealer in dealers:
+            # Get its content in `doc` object
+            dealer_doc = dealer["doc"]
+            # print(dealer_doc)
+            # Create a CarDealer object with values in `doc` object
+            dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"],
+                                   id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"], full_name=dealer_doc["full_name"],
+                                
+                                   st=dealer_doc["st"], zip=dealer_doc["zip"], short_name=dealer_doc["short_name"] , state=dealer_doc["state"])
+            results.append(dealer_obj)
 
     return results
 
 # Gets a single dealer from the Cloudant DB with the Cloud Function get-dealerships
 # Requires the dealer_id parameter with only a single value
-def get_dealer_by_id(url, id):
+def get_dealer_by_id_from_cf(url, id):
     # Call get_request with the dealer_id param
     json_result = get_request(url, id=id)
     # Create a CarDealer object from response
@@ -75,23 +84,6 @@ def get_dealer_by_id(url, id):
                            st=dealer["st"], state=dealer["state"], zip=dealer["zip"])
 
     return dealer_obj
-
-# Gets all dealers in the specified state from the Cloudant DB with the Cloud Function get-dealerships
-def get_dealers_by_state(url, state):
-    results = []
-    # Call get_request with the state param
-    json_result = get_request(url, state=state)
-    dealers = json_result["body"]["docs"]
-    # For each dealer in the response
-    for dealer in dealers:
-        # Create a CarDealer object with values in 'doc' object
-        dealer_obj = CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
-                               id=dealer["id"], lat=dealer["lat"], long=dealer["long"],
-                               short_name=dealer["short_name"],
-                               st=dealer["st"], state=dealer["state"], zip=dealer["zip"])
-        results.append(dealer_obj)
-
-    return results
 
 # Gets all dealer reviews for a specified dealer from the Cloudant DB
 # Uses the Cloud Function get_reviews
